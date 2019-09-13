@@ -1,2 +1,7 @@
-.cpcache
+.lein-failures
+.cljs_node_repl
 .nrepl-port
+/target
+/out
+/pom.xml
+/pom.xml.asc
