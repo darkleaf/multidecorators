@@ -13,17 +13,17 @@
 #?(:clj (derive Object ::d))
 
 (t/deftest usage
-  (let [multi (-> (md/multi identity (constantly []))
-                  (md/decorate ::a (fn [super obj] (conj (super obj) :a)))
-                  ^:repeated
-                  (md/decorate ::a (fn [super obj] (conj (super obj) :a)))
-                  (md/decorate ::b (fn [super obj] (conj (super obj) :b)))
-                  (md/decorate ::c (fn [super obj] (conj (super obj) :c)))
-                  (md/decorate ::d (fn [super obj] (conj (super obj) :d)))
-                  ^:additional
-                  (md/decorate ::e (fn [super obj] (conj (super obj) :e)))
-                  (md/decorate `s  (fn [super obj] (conj (super obj) 's)))
-                  #?(:clj (md/decorate Object (fn [super obj] (conj (super obj) :obj)))))]
+  (let [multi (doto (md/multi identity (constantly []))
+                (md/decorate ::a (fn [super obj] (conj (super obj) :a)))
+                ^:repeated
+                (md/decorate ::a (fn [super obj] (conj (super obj) :a)))
+                (md/decorate ::b (fn [super obj] (conj (super obj) :b)))
+                (md/decorate ::c (fn [super obj] (conj (super obj) :c)))
+                (md/decorate ::d (fn [super obj] (conj (super obj) :d)))
+                ^:additional
+                (md/decorate ::e (fn [super obj] (conj (super obj) :e)))
+                (md/decorate `s  (fn [super obj] (conj (super obj) 's)))
+                #?(:clj (md/decorate Object (fn [super obj] (conj (super obj) :obj)))))]
 
     (t/is (= [:a] (multi ::a)))
     (t/is (= [:a :b] (multi ::b)))
