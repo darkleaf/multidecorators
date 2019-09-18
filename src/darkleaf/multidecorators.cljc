@@ -36,6 +36,6 @@
                           tags)]
          (apply f obj args))))))
 
-(defn decorate [multi tag decorator]
+(defn ^{:style/indent :defn} decorate [multi tag decorator]
   (swap! (multi) assoc tag decorator)
   multi)

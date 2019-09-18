@@ -28,25 +28,25 @@ Like multimethods but multidecorators.
 
 (defonce func (md/multi identity #'initial))
 
-(defn a-decorator [super obj]
-  (conj (super obj) :a))
-(md/decorate func ::a #'a-decorator)
+(md/decorate func ::a
+  (fn a-decorator [super obj]
+    (conj (super obj) :a)))
 
-(defn b-decorator [super obj]
-  (conj (super obj) :b))
-(md/decorate func ::b #'b-decorator)
+(md/decorate func ::b
+  (fn b-decorator [super obj]
+    (conj (super obj) :b)))
 
-(defn c-decorator [super obj]
-  (conj (super obj) :c))
-(md/decorate func ::c #'c-decorator)
+(md/decorate func ::c
+  (fn c-decorator [super obj]
+    (conj (super obj) :c)))
 
-(defn d-decorator [super obj]
-  (conj (super obj) :d))
-(md/decorate func ::d #'d-decorator)
+(md/decorate func ::d
+  (fn d-decorator [super obj]
+    (conj (super obj) :d)))
 
-(defn e-decorator [super obj]
-  (conj (super obj) :e))
-(md/decorate func ::e #'e-decorator)
+(md/decorate func ::e
+  (fn e-decorator [super obj]
+    (conj (super obj) :e)))
 
 (assert (= [:a] (func ::a)))
 (assert (= [:a :b] (func ::b)))
