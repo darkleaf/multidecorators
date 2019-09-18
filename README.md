@@ -23,10 +23,13 @@ Like multimethods but multidecorators.
 (derive ::b ::a)
 (derive ::c ::a)
 
+(defn dispatch [obj]
+  obj)
+
 (defn initial [obj]
   [])
 
-(defonce func (md/multi identity #'initial))
+(defonce func (md/multi #'dispatch #'initial))
 
 (md/decorate func ::a
   (fn a-decorator [super obj]
