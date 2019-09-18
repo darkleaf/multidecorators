@@ -1,4 +1,4 @@
-(defproject darkleaf/multidecorators "1.0.3"
+(defproject darkleaf/multidecorators "1.0.4"
   :description "Like multimethods but multidecorators."
   :url "https://github.com/darkleaf/multidecorators/"
   :license {:name "Unlicense"
