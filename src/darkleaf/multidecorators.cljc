@@ -6,7 +6,7 @@
 
 (defn- tag-name [tag]
   (cond
-    #?@(:clj [(class? tag) (.getName tag)])
+    #?@(:clj [(class? tag) (.getSimpleName tag)])
     :else (name tag)))
 
 (defn- reversed-me-and-ancestors [tag]
