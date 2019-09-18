@@ -4,16 +4,19 @@
   #?(:clj  clojure.lang.PersistentQueue/EMPTY
      :cljs cljs.core/PersistentQueue.EMPTY))
 
-(defn- inversed-compare [a b]
-  (compare b a))
+(defn- tag-name [tag]
+  (cond
+    #?@(:clj [(class? tag) (.getName tag)])
+    :else (name tag)))
 
 (defn- reversed-me-and-ancestors [tag]
   (loop [acc   (list tag)
          queue (conj empty-queue tag)]
     (if-some [tag (peek queue)]
-      (let [prnts (->> tag parents (sort-by str inversed-compare))]
-        (recur (into acc         prnts)
-               (into (pop queue) prnts)))
+      (let [tag-parents          (->> tag parents (sort-by tag-name))
+            reversed-tag-parents (reverse tag-parents)]
+        (recur (into acc reversed-tag-parents)
+               (into (pop queue) tag-parents)))
       (distinct acc))))
 
 (defn multi [dispatch initial]
