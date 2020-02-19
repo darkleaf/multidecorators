@@ -20,13 +20,16 @@
       (distinct acc))))
 
 (defn multi [dispatch initial]
-  (let [registry (atom {})]
+  (let [iregistry (atom {})]
     (fn
-      ([] registry)
+      ([] {:type      :dynamic
+           :iregistry iregistry
+           :dispatch  dispatch
+           :initial   initial})
       ([obj & args]
        (let [tag  (apply dispatch obj args)
              tags (reversed-me-and-ancestors tag)
-             reg  @registry
+             reg  @iregistry
              f    (reduce (fn [acc tag]
                             (if-some [decorator (reg tag)]
                               (fn [obj & args]
@@ -37,5 +40,7 @@
          (apply f obj args))))))
 
 (defn ^{:style/indent :defn} decorate [multi tag decorator]
-  (swap! (multi) assoc tag decorator)
-  multi)
+  (let [state     (multi)
+        iregistry (:iregistry state)]
+    (swap! iregistry assoc tag decorator)
+    multi))
