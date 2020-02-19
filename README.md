@@ -59,6 +59,13 @@ Like multimethods but multidecorators.
 (assert (= [] (func ::f)))
 ```
 
+## Memoization
+
+```clojure
+(defn -main []
+  (alter-var-root #'func md/memoize-multi))
+```
+
 ## Development
 
 ```

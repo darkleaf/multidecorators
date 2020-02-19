@@ -19,23 +19,49 @@
                (into (pop queue) tag-parents)))
       (distinct acc))))
 
+(defn- method [registry tag initial]
+  (let [tags (reversed-me-and-ancestors tag)]
+    (->> tags
+         (map registry)
+         (remove nil?)
+         (reduce (fn [acc decorator]
+                   (fn [obj & args]
+                     (apply decorator acc obj args)))
+                 initial))))
+
 (defn multi [dispatch initial]
-  (let [registry (atom {})]
+  (let [iregistry (atom {})]
     (fn
-      ([] registry)
+      ([] {:type      :dynamic
+           :iregistry iregistry
+           :dispatch  dispatch
+           :initial   initial})
       ([obj & args]
        (let [tag  (apply dispatch obj args)
-             tags (reversed-me-and-ancestors tag)
-             reg  @registry
-             f    (reduce (fn [acc tag]
-                            (if-some [decorator (reg tag)]
-                              (fn [obj & args]
-                                (apply decorator acc obj args))
-                              acc))
-                          initial
-                          tags)]
+             f    (method @iregistry tag initial)]
          (apply f obj args))))))
 
+(defn memoize-multi [multi]
+  (case (:type (multi))
+    :memoized multi
+    :dynamic  (let [{:keys [iregistry
+                            dispatch
+                            initial]} (multi)
+                    registry          @iregistry
+                    mem-method        (memoize method)]
+                (fn
+                  ([] {:type     :memoized
+                       :registry registry
+                       :initial  initial
+                       :dispatch dispatch})
+                  ([obj & args]
+                   (let [tag (apply dispatch obj args)
+                         f   (mem-method registry tag initial)]
+                     (apply f obj args)))))))
+
 (defn ^{:style/indent :defn} decorate [multi tag decorator]
-  (swap! (multi) assoc tag decorator)
-  multi)
+  (case (:type (multi))
+    :dynamic (let [state     (multi)
+                   iregistry (:iregistry state)]
+               (swap! iregistry assoc tag decorator)
+               multi)))
