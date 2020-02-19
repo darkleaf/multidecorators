@@ -19,6 +19,16 @@
                (into (pop queue) tag-parents)))
       (distinct acc))))
 
+(defn- method [registry tag initial]
+  (let [tags (reversed-me-and-ancestors tag)]
+    (->> tags
+         (map registry)
+         (remove nil?)
+         (reduce (fn [acc decorator]
+                   (fn [obj & args]
+                     (apply decorator acc obj args)))
+                 initial))))
+
 (defn multi [dispatch initial]
   (let [iregistry (atom {})]
     (fn
@@ -28,15 +38,7 @@
            :initial   initial})
       ([obj & args]
        (let [tag  (apply dispatch obj args)
-             tags (reversed-me-and-ancestors tag)
-             reg  @iregistry
-             f    (reduce (fn [acc tag]
-                            (if-some [decorator (reg tag)]
-                              (fn [obj & args]
-                                (apply decorator acc obj args))
-                              acc))
-                          initial
-                          tags)]
+             f    (method @iregistry tag initial)]
          (apply f obj args))))))
 
 (defn ^{:style/indent :defn} decorate [multi tag decorator]
